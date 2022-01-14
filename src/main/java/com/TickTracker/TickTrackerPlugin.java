@@ -24,6 +24,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
+@EqualsAndHashCode(callSuper = false)
 @PluginDescriptor(
 	name = "Tick tracker",
 	description = "Display tick timing variance in an overlay",
