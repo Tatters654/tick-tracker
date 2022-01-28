@@ -42,8 +42,8 @@ public class TickTrackerOverlay extends OverlayPanel
 	private LineComponent tickOverThresholdLineComponent(int tickOverThreshold, String configThreshold)
 	{
 		return LineComponent.builder()
-			.right(tickOverThreshold + " (" + String.format("%.2f", (tickOverThreshold * 1.0 / plugin.getAllTickCounter()) * 100) + " %)")
-			.left(">" + configThreshold)
+			.right(String.format("%d (%.2f %%)", tickOverThreshold, (tickOverThreshold * 100.0) / plugin.getAllTickCounter()))
+			.left("+/- >" + configThreshold)
 			.build();
 	}
 
@@ -54,11 +54,12 @@ public class TickTrackerOverlay extends OverlayPanel
 			tickOverThresholdLineComponent(plugin.getTickOverThresholdMedium(), String.valueOf(config.getThresholdMedium())),
 			tickOverThresholdLineComponent(plugin.getTickOverThresholdLow(), String.valueOf(config.getThresholdLow())),
 			LineComponent.builder()
-				.right(plugin.getTickWithinRange() + " (" + String.format("%.2f", (plugin.getTickWithinRange() * 1.0 / plugin.getAllTickCounter()) * 100) + " %)")
+				.right(String.format("%d (%.2f %%)", plugin.getTickWithinRange(), plugin.getTickWithinRangePercent()))
 				.left("Good")
 				.build(),
 			LineComponent.builder().right(String.valueOf(plugin.getAllTickCounter())).left("Total").build(),
-			LineComponent.builder().right(String.valueOf(plugin.getRunningTickAverage())).left("Tick Average ms").build()));
-		panelComponent.setPreferredSize(new Dimension(graphics.getFontMetrics().stringWidth("average tick ms+extra fill" + plugin.getRunningTickAverage()), 0));
+			LineComponent.builder().right(String.valueOf(plugin.getTickDiffNS() / plugin.getNANOS_PER_MILLIS())).left("Last Tick ms").build(),
+			LineComponent.builder().right(String.valueOf(plugin.getRunningTickAverageNS() / plugin.getNANOS_PER_MILLIS())).left("Tick Average ms").build()));
+		panelComponent.setPreferredSize(new Dimension(graphics.getFontMetrics().stringWidth("average tick ms+extra fill600"), 0));
 	}
 }

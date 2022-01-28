@@ -3,6 +3,8 @@ package com.TickTracker;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import javax.inject.Inject;
+
+import com.TickTracker.config.SmallOverlayStyle;
 import net.runelite.api.Client;
 import net.runelite.api.Point;
 import net.runelite.api.widgets.Widget;
@@ -41,7 +43,7 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		if (config.drawSmallOverlay())
+		if (config.drawSmallOverlay() != SmallOverlayStyle.NONE)
 		{
 			drawSmallOverlay(graphics);
 		}
@@ -57,13 +59,27 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 		{
 			xOffset += logoutButton.getWidth();
 		}
-		final String text = String.format("%.2f", plugin.getTickWithinRangePercent()) + "%";
-		final int textWidth = graphics.getFontMetrics().stringWidth(text);
+
+		StringBuilder overlayText = new StringBuilder();
+		if (config.drawSmallOverlay() == SmallOverlayStyle.PERCENTAGE || config.drawSmallOverlay() == SmallOverlayStyle.BOTH)
+		{
+			overlayText.append(String.format("%.2f%%", plugin.getTickWithinRangePercent()));
+			if (config.drawSmallOverlay() == SmallOverlayStyle.BOTH)
+			{
+				overlayText.append(" / ");
+			}
+		}
+		if (config.drawSmallOverlay() == SmallOverlayStyle.LAST_DIFF || config.drawSmallOverlay() == SmallOverlayStyle.BOTH)
+		{
+			overlayText.append(String.format("%dms", plugin.getTickDiffNS() / plugin.getNANOS_PER_MILLIS()));
+		}
+
+		final int textWidth = graphics.getFontMetrics().stringWidth(overlayText.toString());
 		final int textHeight = graphics.getFontMetrics().getAscent() - graphics.getFontMetrics().getDescent();
 
 		final int width = (int) client.getRealDimensions().getWidth();
 		final Point point = new Point(width - textWidth - xOffset, textHeight + Y_OFFSET);
-		OverlayUtil.renderTextLocation(graphics, point, text, plugin.colorSelection());
+		OverlayUtil.renderTextLocation(graphics, point, overlayText.toString(), plugin.colorSelection());
 	}
 
 }

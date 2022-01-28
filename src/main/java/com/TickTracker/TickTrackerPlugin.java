@@ -3,7 +3,6 @@ package com.TickTracker;
 
 import com.google.inject.Provides;
 import java.awt.Color;
-import java.util.Date;
 import javax.inject.Inject;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -63,14 +62,17 @@ public class TickTrackerPlugin extends Plugin
 	@Inject
 	private TickTrackerSmallOverlay SmallOverlay;
 
-	private long lastTickTime = 0L;
-	private int tickTimePassed = 0;
+	private final long NANOS_PER_MILLIS = 1000000L;
+	private final long  IDEAL_TICK_LENGTH_NS = 600L * NANOS_PER_MILLIS;
+	private long lastTickTimeNS = 0L;
+	private long tickDiffNS = 0;
+	private long tickTimePassedNS = 0;
 	private int tickOverThresholdLow = 0;
 	private int tickOverThresholdMedium = 0;
 	private int tickOverThresholdHigh = 0;
 	private int tickWithinRange = 0;
 	private int allTickCounter = 0;
-	private int runningTickAverage = 0;
+	private long runningTickAverageNS = 0;
 	private int disregardCounter = 0;
 	private double tickWithinRangePercent = 0;
 
@@ -96,20 +98,18 @@ public class TickTrackerPlugin extends Plugin
 
 	public Color colorSelection()
 	{
-		Color colorSelection;
 		if (getTickWithinRangePercent() > config.warningColorThreshold())
 		{
-			colorSelection = Color.GREEN;
+			return Color.GREEN;
 		}
 		else if (getTickWithinRangePercent() > config.warningColorThreshold() - 2)
 		{
-			colorSelection = Color.YELLOW;
+			return Color.YELLOW;
 		}
 		else
 		{
-			colorSelection = Color.RED;
+			return Color.RED;
 		}
-		return colorSelection;
 	}
 
 	@Subscribe
@@ -118,60 +118,62 @@ public class TickTrackerPlugin extends Plugin
 		if (disregardCounter < config.disregardCounter())
 		{
 			disregardCounter += 1; // waiting 10 ticks, because ticks upon login or hopping are funky
+			return;
+		}
+
+		long tickTimeNS = System.nanoTime();
+		tickDiffNS = tickTimeNS - lastTickTimeNS;
+		lastTickTimeNS = tickTimeNS;
+
+		if (tickDiffNS > 2500 * NANOS_PER_MILLIS)
+		{
+			if (config.warnLargeTickDiff())
+			{
+				sendChatMessage("Disregarding tick because it was over too long");
+			}
+			return;
+		}
+
+		long tickVarianceFromIdealMS = Math.abs(IDEAL_TICK_LENGTH_NS - tickDiffNS) / NANOS_PER_MILLIS;
+		if (tickVarianceFromIdealMS > config.getThresholdHigh())
+		{
+			tickOverThresholdHigh += 1;
+		}
+		else if (tickVarianceFromIdealMS > config.getThresholdMedium())
+		{
+			tickOverThresholdMedium += 1;
+		}
+		else if (tickVarianceFromIdealMS > config.getThresholdLow())
+		{
+			tickOverThresholdLow += 1;
 		}
 		else
 		{
-
-			long tickTime = new Date().getTime();
-			int tickDiff = (int) (tickTime - lastTickTime);
-			if (tickDiff > 2500)
-			{
-				lastTickTime = new Date().getTime();
-				if (config.warnLargeTickDiff())
-				{
-					sendChatMessage("Disregarding tick because it was over too long");
-				}
-				return;
-
-			}
-			lastTickTime = new Date().getTime();
-
-			allTickCounter += 1;
-			tickTimePassed += tickDiff;
-			runningTickAverage = tickTimePassed / allTickCounter;
-			tickWithinRangePercent = (tickWithinRange * 1.0 / allTickCounter) * 100;
-
-			if (tickDiff > config.getThresholdHigh())
-			{
-				tickOverThresholdHigh += 1;
-			}
-			else if (tickDiff > config.getThresholdMedium())
-			{
-				tickOverThresholdMedium += 1;
-			}
-			else if (tickDiff > config.getThresholdLow())
-			{
-				tickOverThresholdLow += 1;
-			}
-			else
-			{
-				tickWithinRange += 1;
-			}
+			tickWithinRange += 1;
 		}
+
+		allTickCounter += 1;
+		tickTimePassedNS += tickDiffNS;
+		runningTickAverageNS = tickTimePassedNS / allTickCounter;
+		tickWithinRangePercent = (tickWithinRange * 100.0) / allTickCounter;
 	}
 
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event)
 	{
-		if (event.getGameState() == HOPPING || (event.getGameState() == LOGGING_IN))
+		if (event.getGameState() == HOPPING || event.getGameState() == LOGGING_IN)
 		{
+			lastTickTimeNS = 0;
+			tickDiffNS = 0;
+			tickTimePassedNS = 0;
 			tickOverThresholdHigh = 0;
 			tickOverThresholdMedium = 0;
 			tickOverThresholdLow = 0;
 			tickWithinRange = 0;
-			runningTickAverage = 0;
 			allTickCounter = 0;
+			runningTickAverageNS = 0;
 			disregardCounter = 0;
+			tickWithinRangePercent = 0;
 		}
 	}
 }
