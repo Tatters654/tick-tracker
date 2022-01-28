@@ -96,4 +96,15 @@ public interface TickTrackerPluginConfiguration extends Config
 	{
 		return 10;
 	}
+
+	@ConfigItem(
+		keyName = "Y_Offset",
+		name = "Height selector",
+		description = "Modify height of small overlay",
+		position = 9
+	)
+	default int Y_Offset()
+	{
+		return 1;
+	}
 }

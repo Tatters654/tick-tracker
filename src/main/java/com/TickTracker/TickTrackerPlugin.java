@@ -35,6 +35,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 public class TickTrackerPlugin extends Plugin
 {
 
+
 	private void sendChatMessage(String chatMessage)
 	{
 		final String message = new ChatMessageBuilder().append(ChatColorType.HIGHLIGHT).append(chatMessage).build();

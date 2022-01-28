@@ -18,7 +18,7 @@ import net.runelite.client.ui.overlay.OverlayUtil;
 
 public class TickTrackerSmallOverlay extends OverlayPanel
 {
-	private static final int Y_OFFSET = 1;
+	//private static final int Y_OFFSET = 1;
 	private static final int X_OFFSET = 1;
 
 	private final Client client;
@@ -78,7 +78,7 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 		final int textHeight = graphics.getFontMetrics().getAscent() - graphics.getFontMetrics().getDescent();
 
 		final int width = (int) client.getRealDimensions().getWidth();
-		final Point point = new Point(width - textWidth - xOffset, textHeight + Y_OFFSET);
+		final Point point = new Point(width - textWidth - xOffset, textHeight + config.Y_Offset());
 		OverlayUtil.renderTextLocation(graphics, point, overlayText.toString(), plugin.colorSelection());
 	}
 
