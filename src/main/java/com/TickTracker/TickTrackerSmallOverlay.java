@@ -71,7 +71,7 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 		}
 		if (config.drawSmallOverlay() == SmallOverlayStyle.LAST_DIFF || config.drawSmallOverlay() == SmallOverlayStyle.BOTH)
 		{
-			overlayText.append(String.format("%dms", plugin.getTickDiffNS() / plugin.getMillisPerNanosecond()));
+			overlayText.append(String.format("%dms", plugin.getTickDiffNS() / plugin.getNANOS_PER_MILLIS()));
 		}
 
 		final int textWidth = graphics.getFontMetrics().stringWidth(overlayText.toString());

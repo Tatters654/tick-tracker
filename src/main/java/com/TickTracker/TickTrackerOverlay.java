@@ -43,7 +43,7 @@ public class TickTrackerOverlay extends OverlayPanel
 	{
 		return LineComponent.builder()
 			.right(String.format("%d (%.2f %%)", tickOverThreshold, (tickOverThreshold * 100.0) / plugin.getAllTickCounter()))
-			.left(">" + configThreshold)
+			.left("+/- >" + configThreshold)
 			.build();
 	}
 
@@ -58,8 +58,8 @@ public class TickTrackerOverlay extends OverlayPanel
 				.left("Good")
 				.build(),
 			LineComponent.builder().right(String.valueOf(plugin.getAllTickCounter())).left("Total").build(),
-			LineComponent.builder().right(String.valueOf(plugin.getTickDiffNS() / plugin.getMillisPerNanosecond())).left("Last Tick ms").build(),
-			LineComponent.builder().right(String.valueOf(plugin.getRunningTickAverageNS() / plugin.getMillisPerNanosecond())).left("Tick Average ms").build()));
+			LineComponent.builder().right(String.valueOf(plugin.getTickDiffNS() / plugin.getNANOS_PER_MILLIS())).left("Last Tick ms").build(),
+			LineComponent.builder().right(String.valueOf(plugin.getRunningTickAverageNS() / plugin.getNANOS_PER_MILLIS())).left("Tick Average ms").build()));
 		panelComponent.setPreferredSize(new Dimension(graphics.getFontMetrics().stringWidth("average tick ms+extra fill600"), 0));
 	}
 }

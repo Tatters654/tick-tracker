@@ -62,7 +62,8 @@ public class TickTrackerPlugin extends Plugin
 	@Inject
 	private TickTrackerSmallOverlay SmallOverlay;
 
-	private final long millisPerNanosecond = 1000000L;
+	private final long NANOS_PER_MILLIS = 1000000L;
+	private final long  IDEAL_TICK_LENGTH_NS = 600L * NANOS_PER_MILLIS;
 	private long lastTickTimeNS = 0L;
 	private long tickDiffNS = 0;
 	private long tickTimePassedNS = 0;
@@ -124,7 +125,7 @@ public class TickTrackerPlugin extends Plugin
 		tickDiffNS = tickTimeNS - lastTickTimeNS;
 		lastTickTimeNS = tickTimeNS;
 
-		if (tickDiffNS > 2500 * millisPerNanosecond)
+		if (tickDiffNS > 2500 * NANOS_PER_MILLIS)
 		{
 			if (config.warnLargeTickDiff())
 			{
@@ -133,15 +134,16 @@ public class TickTrackerPlugin extends Plugin
 			return;
 		}
 
-		if (tickDiffNS > config.getThresholdHigh() * millisPerNanosecond)
+		long tickVarianceFromIdealMS = Math.abs(IDEAL_TICK_LENGTH_NS - tickDiffNS) / NANOS_PER_MILLIS;
+		if (tickVarianceFromIdealMS > config.getThresholdHigh())
 		{
 			tickOverThresholdHigh += 1;
 		}
-		else if (tickDiffNS > config.getThresholdMedium() * millisPerNanosecond)
+		else if (tickVarianceFromIdealMS > config.getThresholdMedium())
 		{
 			tickOverThresholdMedium += 1;
 		}
-		else if (tickDiffNS > config.getThresholdLow() * millisPerNanosecond)
+		else if (tickVarianceFromIdealMS > config.getThresholdLow())
 		{
 			tickOverThresholdLow += 1;
 		}

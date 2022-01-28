@@ -10,36 +10,36 @@ import net.runelite.client.config.ConfigItem;
 public interface TickTrackerPluginConfiguration extends Config
 {
 	@ConfigItem(
-		keyName = "thresholdHigh",
-		name = "Threshold High",
-		description = "Threshold for high tick latency",
+		keyName = "varianceHigh",
+		name = "Variance High",
+		description = "Variance for high tick latency +/-",
 		position = 2
 	)
 	default int getThresholdHigh()
 	{
-		return 750;
+		return 150;
 	}
 
 	@ConfigItem(
-		keyName = "thresholdMedium",
-		name = "Threshold Medium",
-		description = "Threshold for medium tick latency",
+		keyName = "varianceMedium",
+		name = "Variance Medium",
+		description = "Variance for medium tick latency +/-",
 		position = 3
 	)
 	default int getThresholdMedium()
 	{
-		return 700;
+		return 100;
 	}
 
 	@ConfigItem(
-		keyName = "thresholdLow",
-		name = "Threshold Low",
-		description = "Threshold for low tick latency",
+		keyName = "varianceLow",
+		name = "Variance Low",
+		description = "Variance for low tick latency +/-",
 		position = 4
 	)
 	default int getThresholdLow()
 	{
-		return 650;
+		return 50;
 	}
 
 	@ConfigItem(
