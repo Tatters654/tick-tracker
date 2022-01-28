@@ -1,6 +1,7 @@
 
 package com.TickTracker;
 
+import com.TickTracker.config.SmallOverlayStyle;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -58,9 +59,9 @@ public interface TickTrackerPluginConfiguration extends Config
 		description = "Whether to draw a small overlay",
 		position = 5
 	)
-	default boolean drawSmallOverlay()
+	default SmallOverlayStyle drawSmallOverlay()
 	{
-		return true;
+		return SmallOverlayStyle.PERCENTAGE;
 	}
 
 	@ConfigItem(
