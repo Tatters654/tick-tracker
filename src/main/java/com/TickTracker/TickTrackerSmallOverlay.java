@@ -18,7 +18,6 @@ import net.runelite.client.ui.overlay.OverlayUtil;
 
 public class TickTrackerSmallOverlay extends OverlayPanel
 {
-	//private static final int Y_OFFSET = 1;
 	private static final int X_OFFSET = 1;
 
 	private final Client client;

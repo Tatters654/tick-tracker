@@ -6,7 +6,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
-@ConfigGroup("com/TickTracker")
+@ConfigGroup("TickTracker")
 public interface TickTrackerPluginConfiguration extends Config
 {
 	@ConfigItem(
