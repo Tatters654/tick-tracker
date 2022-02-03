@@ -4,8 +4,8 @@ package com.TickTracker;
 import com.google.inject.Provides;
 import java.awt.Color;
 import javax.inject.Inject;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
 import static net.runelite.api.GameState.HOPPING;
@@ -23,7 +23,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-@EqualsAndHashCode(callSuper = false)
+
 @PluginDescriptor(
 	name = "Tick tracker",
 	description = "Display tick timing variance in an overlay",
@@ -31,11 +31,9 @@ import net.runelite.client.ui.overlay.OverlayManager;
 	enabledByDefault = false
 )
 
-@Data
+@Getter @Setter
 public class TickTrackerPlugin extends Plugin
 {
-
-
 	private void sendChatMessage(String chatMessage)
 	{
 		final String message = new ChatMessageBuilder().append(ChatColorType.HIGHLIGHT).append(chatMessage).build();
@@ -91,7 +89,7 @@ public class TickTrackerPlugin extends Plugin
 	}
 
 	@Override
-	protected void startUp() throws Exception
+	protected void startUp()
 	{
 		overlayManager.add(overlay);
 		overlayManager.add(SmallOverlay);
@@ -156,7 +154,6 @@ public class TickTrackerPlugin extends Plugin
 		allTickCounter += 1;
 		tickTimePassedNS += tickDiffNS;
 		runningTickAverageNS = tickTimePassedNS / allTickCounter;
-		tickWithinRangePercent = (tickWithinRange * 100.0) / allTickCounter;
 	}
 
 	@Subscribe
