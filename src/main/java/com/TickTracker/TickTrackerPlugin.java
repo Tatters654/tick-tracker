@@ -154,6 +154,7 @@ public class TickTrackerPlugin extends Plugin
 		allTickCounter += 1;
 		tickTimePassedNS += tickDiffNS;
 		runningTickAverageNS = tickTimePassedNS / allTickCounter;
+		tickWithinRangePercent = (tickWithinRange * 100.0) / allTickCounter;
 	}
 
 	@Subscribe
