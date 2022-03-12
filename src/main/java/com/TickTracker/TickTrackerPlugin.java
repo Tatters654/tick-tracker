@@ -114,15 +114,15 @@ public class TickTrackerPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick tick)
 	{
+		long tickTimeNS = System.nanoTime();
+		tickDiffNS = tickTimeNS - lastTickTimeNS;
+		lastTickTimeNS = tickTimeNS;
+
 		if (disregardCounter < config.disregardCounter())
 		{
 			disregardCounter += 1; // waiting 10 ticks, because ticks upon login or hopping are funky
 			return;
 		}
-
-		long tickTimeNS = System.nanoTime();
-		tickDiffNS = tickTimeNS - lastTickTimeNS;
-		lastTickTimeNS = tickTimeNS;
 
 		if (tickDiffNS > 2500 * NANOS_PER_MILLIS)
 		{
