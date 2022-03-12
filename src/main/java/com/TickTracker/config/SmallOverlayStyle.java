@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SmallOverlayStyle {
     NONE("Off"),
-    PERCENTAGE("Percentage Good"),
+    PERCENTAGE("Percent Good"),
     LAST_DIFF("Last Tick ms"),
     BOTH("Both");
 

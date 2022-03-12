@@ -5,6 +5,7 @@ import com.TickTracker.config.SmallOverlayStyle;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.Range;
 
 @ConfigGroup(TickTrackerPluginConfiguration.GROUP)
 public interface TickTrackerPluginConfiguration extends Config
@@ -67,21 +68,49 @@ public interface TickTrackerPluginConfiguration extends Config
 	}
 
 	@ConfigItem(
-		keyName = "warningText",
-		name = "Small overlay text color threshold",
-		description = "Above threshold = Green, Above Threshold -2 = Yellow, Below that = Red",
-		position = 6
+			keyName = "colorSmallOverlay",
+			name = "Color Small overlay",
+			description = "Off for yellow, other options use the text color thresholds",
+			position = 6
 	)
-	default int warningColorThreshold()
+	default SmallOverlayStyle smallOverlayColorStyle()
+	{
+		return SmallOverlayStyle.BOTH;
+	}
+
+	@Range(
+			max = 100
+	)
+	@ConfigItem(
+		keyName = "warningText",
+		name = "Color % threshold upper",
+		description = "Above threshold upper = Green, between threshold upper and lower = Yellow, below threshold lower = Red",
+		position = 7
+	)
+	default int warningColorThresholdUpper()
 	{
 		return 90;
+	}
+
+	@Range(
+			max = 100
+	)
+	@ConfigItem(
+		keyName = "warningTextLower",
+		name = "Color % threshold lower",
+		description = "Above threshold upper = Green, between threshold upper and lower = Yellow, below threshold lower = Red",
+		position = 8
+	)
+	default int warningColorThresholdLower()
+	{
+		return 88;
 	}
 
 	@ConfigItem(
 		keyName = "warnLargeTickDiff",
 		name = "Warn in chat about large tick lags",
 		description = "Print notification in chat of ticks over 2500ms",
-		position = 7
+		position = 9
 	)
 	default boolean warnLargeTickDiff()
 	{
@@ -92,7 +121,7 @@ public interface TickTrackerPluginConfiguration extends Config
 		keyName = "disregardCounter",
 		name = "Disregard ticks on login",
 		description = "Ticks on login are very inconsistent. This just disregards x many ticks starting from login to make the plugin more accurate.",
-		position = 8
+		position = 10
 	)
 	default int disregardCounter()
 	{
@@ -103,7 +132,7 @@ public interface TickTrackerPluginConfiguration extends Config
 		keyName = "Y_Offset",
 		name = "Height selector",
 		description = "Modify height of small overlay",
-		position = 9
+		position = 11
 	)
 	default int Y_Offset()
 	{

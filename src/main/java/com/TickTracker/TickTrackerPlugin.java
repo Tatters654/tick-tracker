@@ -2,14 +2,10 @@
 package com.TickTracker;
 
 import com.google.inject.Provides;
-import java.awt.Color;
-import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
-import static net.runelite.api.GameState.HOPPING;
-import static net.runelite.api.GameState.LOGGING_IN;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.callback.ClientThread;
@@ -23,6 +19,11 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
+
+import javax.inject.Inject;
+
+import static net.runelite.api.GameState.HOPPING;
+import static net.runelite.api.GameState.LOGGING_IN;
 
 
 @PluginDescriptor(
@@ -94,22 +95,6 @@ public class TickTrackerPlugin extends Plugin
 	{
 		overlayManager.add(overlay);
 		overlayManager.add(SmallOverlay);
-	}
-
-	public Color colorSelection()
-	{
-		if (getTickWithinRangePercent() > config.warningColorThreshold())
-		{
-			return Color.GREEN;
-		}
-		else if (getTickWithinRangePercent() > config.warningColorThreshold() - 2)
-		{
-			return Color.YELLOW;
-		}
-		else
-		{
-			return Color.RED;
-		}
 	}
 
 	@Subscribe
