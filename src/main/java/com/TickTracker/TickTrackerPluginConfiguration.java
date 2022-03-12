@@ -6,9 +6,11 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
-@ConfigGroup("TickTracker")
+@ConfigGroup(TickTrackerPluginConfiguration.GROUP)
 public interface TickTrackerPluginConfiguration extends Config
 {
+	String GROUP = "TickTracker";
+
 	@ConfigItem(
 		keyName = "varianceHigh",
 		name = "Variance High",

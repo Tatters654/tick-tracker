@@ -19,6 +19,7 @@ import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -73,7 +74,7 @@ public class TickTrackerPlugin extends Plugin
 	private int allTickCounter = 0;
 	private long runningTickAverageNS = 0;
 	private int disregardCounter = 0;
-	private double tickWithinRangePercent = 0;
+	private double tickWithinRangePercent = 100;
 
 	@Provides
 	TickTrackerPluginConfiguration provideConfig(ConfigManager configManager)
@@ -162,17 +163,36 @@ public class TickTrackerPlugin extends Plugin
 	{
 		if (event.getGameState() == HOPPING || event.getGameState() == LOGGING_IN)
 		{
-			lastTickTimeNS = 0;
-			tickDiffNS = 0;
-			tickTimePassedNS = 0;
-			tickOverThresholdHigh = 0;
-			tickOverThresholdMedium = 0;
-			tickOverThresholdLow = 0;
-			tickWithinRange = 0;
-			allTickCounter = 0;
-			runningTickAverageNS = 0;
-			disregardCounter = 0;
-			tickWithinRangePercent = 0;
+			resetStats(false);
 		}
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event) {
+		if (TickTrackerPluginConfiguration.GROUP.equals(event.getGroup())) {
+			String key = event.getKey();
+			if ("varianceHigh".equals(key) || "varianceMedium".equals(key) || "varianceLow".equals(key)) {
+				resetStats(true);
+			}
+		}
+	}
+
+	private void resetStats(boolean onlyVarianceRelevantStats) {
+		tickOverThresholdHigh = 0;
+		tickOverThresholdMedium = 0;
+		tickOverThresholdLow = 0;
+		tickWithinRange = 0;
+		allTickCounter = 0;
+		tickTimePassedNS = 0;
+		tickWithinRangePercent = 100;
+
+		if (onlyVarianceRelevantStats) {
+			return;
+		}
+
+		lastTickTimeNS = 0;
+		tickDiffNS = 0;
+		runningTickAverageNS = 0;
+		disregardCounter = 0;
 	}
 }
