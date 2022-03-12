@@ -60,17 +60,18 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 		}
 
 		StringBuilder overlayText = new StringBuilder();
-		if (config.drawSmallOverlay() == SmallOverlayStyle.PERCENTAGE || config.drawSmallOverlay() == SmallOverlayStyle.BOTH)
-		{
-			overlayText.append(String.format("%.2f%%", plugin.getTickWithinRangePercent()));
-			if (config.drawSmallOverlay() == SmallOverlayStyle.BOTH)
-			{
-				overlayText.append(" / ");
+		if (plugin.getDisregardCounter() < config.disregardCounter()) {
+			overlayText.append("Waiting...");
+		} else {
+			if (config.drawSmallOverlay() == SmallOverlayStyle.PERCENTAGE || config.drawSmallOverlay() == SmallOverlayStyle.BOTH) {
+				overlayText.append(String.format("%.2f%%", plugin.getTickWithinRangePercent()));
+				if (config.drawSmallOverlay() == SmallOverlayStyle.BOTH) {
+					overlayText.append(" / ");
+				}
 			}
-		}
-		if (config.drawSmallOverlay() == SmallOverlayStyle.LAST_DIFF || config.drawSmallOverlay() == SmallOverlayStyle.BOTH)
-		{
-			overlayText.append(String.format("%dms", plugin.getTickDiffNS() / plugin.getNANOS_PER_MILLIS()));
+			if (config.drawSmallOverlay() == SmallOverlayStyle.LAST_DIFF || config.drawSmallOverlay() == SmallOverlayStyle.BOTH) {
+				overlayText.append(String.format("%dms", plugin.getTickDiffNS() / plugin.getNANOS_PER_MILLIS()));
+			}
 		}
 
 		final int textWidth = graphics.getFontMetrics().stringWidth(overlayText.toString());
