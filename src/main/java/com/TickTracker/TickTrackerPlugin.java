@@ -2,14 +2,10 @@
 package com.TickTracker;
 
 import com.google.inject.Provides;
-import java.awt.Color;
-import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.Client;
-import static net.runelite.api.GameState.HOPPING;
-import static net.runelite.api.GameState.LOGGING_IN;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.callback.ClientThread;
@@ -19,9 +15,15 @@ import net.runelite.client.chat.ChatMessageManager;
 import net.runelite.client.chat.QueuedMessage;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
+
+import javax.inject.Inject;
+
+import static net.runelite.api.GameState.HOPPING;
+import static net.runelite.api.GameState.LOGGING_IN;
 
 
 @PluginDescriptor(
@@ -73,7 +75,7 @@ public class TickTrackerPlugin extends Plugin
 	private int allTickCounter = 0;
 	private long runningTickAverageNS = 0;
 	private int disregardCounter = 0;
-	private double tickWithinRangePercent = 0;
+	private double tickWithinRangePercent = 100;
 
 	@Provides
 	TickTrackerPluginConfiguration provideConfig(ConfigManager configManager)
@@ -95,34 +97,18 @@ public class TickTrackerPlugin extends Plugin
 		overlayManager.add(SmallOverlay);
 	}
 
-	public Color colorSelection()
-	{
-		if (getTickWithinRangePercent() > config.warningColorThreshold())
-		{
-			return Color.GREEN;
-		}
-		else if (getTickWithinRangePercent() > config.warningColorThreshold() - 2)
-		{
-			return Color.YELLOW;
-		}
-		else
-		{
-			return Color.RED;
-		}
-	}
-
 	@Subscribe
 	public void onGameTick(GameTick tick)
 	{
+		long tickTimeNS = System.nanoTime();
+		tickDiffNS = tickTimeNS - lastTickTimeNS;
+		lastTickTimeNS = tickTimeNS;
+
 		if (disregardCounter < config.disregardCounter())
 		{
 			disregardCounter += 1; // waiting 10 ticks, because ticks upon login or hopping are funky
 			return;
 		}
-
-		long tickTimeNS = System.nanoTime();
-		tickDiffNS = tickTimeNS - lastTickTimeNS;
-		lastTickTimeNS = tickTimeNS;
 
 		if (tickDiffNS > 2500 * NANOS_PER_MILLIS)
 		{
@@ -162,17 +148,36 @@ public class TickTrackerPlugin extends Plugin
 	{
 		if (event.getGameState() == HOPPING || event.getGameState() == LOGGING_IN)
 		{
-			lastTickTimeNS = 0;
-			tickDiffNS = 0;
-			tickTimePassedNS = 0;
-			tickOverThresholdHigh = 0;
-			tickOverThresholdMedium = 0;
-			tickOverThresholdLow = 0;
-			tickWithinRange = 0;
-			allTickCounter = 0;
-			runningTickAverageNS = 0;
-			disregardCounter = 0;
-			tickWithinRangePercent = 0;
+			resetStats(false);
 		}
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged event) {
+		if (TickTrackerPluginConfiguration.GROUP.equals(event.getGroup())) {
+			String key = event.getKey();
+			if ("varianceHigh".equals(key) || "varianceMedium".equals(key) || "varianceLow".equals(key)) {
+				resetStats(true);
+			}
+		}
+	}
+
+	private void resetStats(boolean onlyVarianceRelevantStats) {
+		tickOverThresholdHigh = 0;
+		tickOverThresholdMedium = 0;
+		tickOverThresholdLow = 0;
+		tickWithinRange = 0;
+		allTickCounter = 0;
+		tickTimePassedNS = 0;
+		tickWithinRangePercent = 100;
+
+		if (onlyVarianceRelevantStats) {
+			return;
+		}
+
+		lastTickTimeNS = 0;
+		tickDiffNS = 0;
+		runningTickAverageNS = 0;
+		disregardCounter = 0;
 	}
 }
