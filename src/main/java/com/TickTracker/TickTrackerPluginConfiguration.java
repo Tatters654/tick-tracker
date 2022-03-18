@@ -109,7 +109,7 @@ public interface TickTrackerPluginConfiguration extends Config
 	@ConfigItem(
 		keyName = "warnLargeTickDiff",
 		name = "Warn in chat about large tick lags",
-		description = "Print notification in chat of ticks over 2500ms",
+		description = "",
 		position = 9
 	)
 	default boolean warnLargeTickDiff()
@@ -118,10 +118,18 @@ public interface TickTrackerPluginConfiguration extends Config
 	}
 
 	@ConfigItem(
+			keyName = "warnLargeTickDiffValue",
+			name = "Warn of ticks over: ",
+			description = "",
+			position = 10
+	)
+	default int warnLargeTickDiffValue() { return 1000; }
+
+	@ConfigItem(
 		keyName = "disregardCounter",
 		name = "Disregard ticks on login",
 		description = "Ticks on login are very inconsistent. This just disregards x many ticks starting from login to make the plugin more accurate.",
-		position = 10
+		position = 11
 	)
 	default int disregardCounter()
 	{
@@ -132,7 +140,7 @@ public interface TickTrackerPluginConfiguration extends Config
 		keyName = "Y_Offset",
 		name = "Height selector",
 		description = "Modify height of small overlay",
-		position = 11
+		position = 12
 	)
 	default int Y_Offset()
 	{

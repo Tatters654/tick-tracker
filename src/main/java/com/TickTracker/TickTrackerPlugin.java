@@ -110,13 +110,12 @@ public class TickTrackerPlugin extends Plugin
 			return;
 		}
 
-		if (tickDiffNS > 2500 * NANOS_PER_MILLIS)
+		if (tickDiffNS * NANOS_PER_MILLIS > config.warnLargeTickDiffValue())
 		{
-			if (config.warnLargeTickDiff())
+			if (config.warnLargeTickDiff() && allTickCounter > 20)
 			{
-				sendChatMessage("Disregarding tick because it was over too long");
+				sendChatMessage("Tick was " + tickDiffNS / NANOS_PER_MILLIS + "ms long");
 			}
-			return;
 		}
 
 		long tickVarianceFromIdealMS = Math.abs(IDEAL_TICK_LENGTH_NS - tickDiffNS) / NANOS_PER_MILLIS;
