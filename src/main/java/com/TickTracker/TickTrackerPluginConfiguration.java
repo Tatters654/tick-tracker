@@ -108,7 +108,7 @@ public interface TickTrackerPluginConfiguration extends Config
 
 	@ConfigItem(
 		keyName = "warnLargeTickDiff",
-		name = "Warn in chat about large tick lags",
+		name = "Warn in chat about large tick lags (ms)",
 		description = "",
 		position = 9
 	)

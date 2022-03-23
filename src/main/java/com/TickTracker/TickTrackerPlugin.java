@@ -110,15 +110,16 @@ public class TickTrackerPlugin extends Plugin
 			return;
 		}
 
-		if (tickDiffNS * NANOS_PER_MILLIS > config.warnLargeTickDiffValue())
+		long tickVarianceFromIdealMS = Math.abs(IDEAL_TICK_LENGTH_NS - tickDiffNS) / NANOS_PER_MILLIS;
+
+		if (tickVarianceFromIdealMS > config.warnLargeTickDiffValue())
 		{
-			if (config.warnLargeTickDiff() && allTickCounter > 20)
+			if (config.warnLargeTickDiff() &&  allTickCounter > config.disregardCounter())
 			{
 				sendChatMessage("Tick was " + tickDiffNS / NANOS_PER_MILLIS + "ms long");
 			}
 		}
 
-		long tickVarianceFromIdealMS = Math.abs(IDEAL_TICK_LENGTH_NS - tickDiffNS) / NANOS_PER_MILLIS;
 		if (tickVarianceFromIdealMS > config.getThresholdHigh())
 		{
 			tickOverThresholdHigh += 1;
