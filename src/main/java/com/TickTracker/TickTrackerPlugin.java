@@ -106,7 +106,7 @@ public class TickTrackerPlugin extends Plugin
 
 		if (disregardCounter < config.disregardCounter())
 		{
-			disregardCounter += 1; // waiting 10 ticks, because ticks upon login or hopping are funky
+			disregardCounter += 1; //ticks upon login or hopping are very inconsistent, thus the need for the disregard of the first ones
 			return;
 		}
 

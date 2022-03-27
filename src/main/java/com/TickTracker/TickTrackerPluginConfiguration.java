@@ -12,11 +12,34 @@ public interface TickTrackerPluginConfiguration extends Config
 {
 	String GROUP = "TickTracker";
 
+
+	@ConfigItem(
+		keyName = "Y_Offset",
+		name = "Height selector",
+		description = "Modify height of small overlay",
+		position = 1
+	)
+	default int Y_Offset()
+	{
+		return 1;
+	}
+
+	@ConfigItem(
+		keyName = "drawLargeOverlay",
+		name = "Show extra information",
+		description = "Show set thresholds and each category's quantity of ticks and percentage of total ticks",
+		position = 2
+	)
+	default boolean drawLargeOverlay()
+	{
+		return false;
+	}
+
 	@ConfigItem(
 		keyName = "varianceHigh",
 		name = "Variance High",
 		description = "Variance for high tick latency +/-",
-		position = 2
+		position = 3
 	)
 	default int getThresholdHigh()
 	{
@@ -27,7 +50,7 @@ public interface TickTrackerPluginConfiguration extends Config
 		keyName = "varianceMedium",
 		name = "Variance Medium",
 		description = "Variance for medium tick latency +/-",
-		position = 3
+		position = 4
 	)
 	default int getThresholdMedium()
 	{
@@ -38,29 +61,20 @@ public interface TickTrackerPluginConfiguration extends Config
 		keyName = "varianceLow",
 		name = "Variance Low",
 		description = "Variance for low tick latency +/-",
-		position = 4
+		position = 5
 	)
 	default int getThresholdLow()
 	{
 		return 50;
 	}
 
-	@ConfigItem(
-		keyName = "drawLargeOverlay",
-		name = "Show extra information",
-		description = "Show set thresholds and each category's quantity of ticks and percentage of total ticks",
-		position = 1
-	)
-	default boolean drawLargeOverlay()
-	{
-		return false;
-	}
+
 
 	@ConfigItem(
 		keyName = "drawSmallOverlay",
-		name = "Draw Small overlay",
+		name = "Small overlay",
 		description = "Whether to draw a small overlay",
-		position = 5
+		position = 6
 	)
 	default SmallOverlayStyle drawSmallOverlay()
 	{
@@ -69,9 +83,9 @@ public interface TickTrackerPluginConfiguration extends Config
 
 	@ConfigItem(
 			keyName = "colorSmallOverlay",
-			name = "Color Small overlay",
+			name = "Color options",
 			description = "Off for yellow, other options use the text color thresholds",
-			position = 6
+			position = 7
 	)
 	default SmallOverlayStyle smallOverlayColorStyle()
 	{
@@ -83,9 +97,9 @@ public interface TickTrackerPluginConfiguration extends Config
 	)
 	@ConfigItem(
 		keyName = "warningText",
-		name = "Color % threshold upper",
-		description = "Above threshold upper = Green, between threshold upper and lower = Yellow, below threshold lower = Red",
-		position = 7
+		name = "High threshold (%)",
+		description = "Decides the color of the overlay. Above high threshold = Green, between high threshold and low = Yellow, below low threshold = Red",
+		position = 8
 	)
 	default int warningColorThresholdUpper()
 	{
@@ -97,9 +111,9 @@ public interface TickTrackerPluginConfiguration extends Config
 	)
 	@ConfigItem(
 		keyName = "warningTextLower",
-		name = "Color % threshold lower",
-		description = "Above threshold upper = Green, between threshold upper and lower = Yellow, below threshold lower = Red",
-		position = 8
+		name = "Low threshold (%)",
+		description = "Decides the color of the overlay. Above high threshold = Green, between high threshold and low = Yellow, below low threshold = Red",
+		position = 9
 	)
 	default int warningColorThresholdLower()
 	{
@@ -108,9 +122,9 @@ public interface TickTrackerPluginConfiguration extends Config
 
 	@ConfigItem(
 		keyName = "warnLargeTickDiff",
-		name = "Warn in chat about large tick lags (ms)",
-		description = "",
-		position = 9
+		name = "Warn in chat about lag (ms)",
+		description = "Prints a warning in the chatbox if a tick is too long or short",
+		position = 10
 	)
 	default boolean warnLargeTickDiff()
 	{
@@ -119,31 +133,22 @@ public interface TickTrackerPluginConfiguration extends Config
 
 	@ConfigItem(
 			keyName = "warnLargeTickDiffValue",
-			name = "Warn of ticks over: ",
-			description = "",
-			position = 10
+			name = "Warn of lag +/-: (ms)",
+			description = "Warn in chat about server ticks being too fast or too slow (ms)",
+			position = 11
 	)
-	default int warnLargeTickDiffValue() { return 1000; }
+	default int warnLargeTickDiffValue() { return 150; }
 
 	@ConfigItem(
 		keyName = "disregardCounter",
 		name = "Disregard ticks on login",
-		description = "Ticks on login are very inconsistent. This just disregards x many ticks starting from login to make the plugin more accurate.",
-		position = 11
+		description = "Ticks on login are very inconsistent. Having this too low can lead to inaccurate measurements.",
+		position = 12
 	)
 	default int disregardCounter()
 	{
-		return 10;
+		return 15;
 	}
 
-	@ConfigItem(
-		keyName = "Y_Offset",
-		name = "Height selector",
-		description = "Modify height of small overlay",
-		position = 12
-	)
-	default int Y_Offset()
-	{
-		return 1;
-	}
+
 }
