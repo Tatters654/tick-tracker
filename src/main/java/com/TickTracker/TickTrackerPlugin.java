@@ -27,7 +27,7 @@ import static net.runelite.api.GameState.LOGGING_IN;
 
 
 @PluginDescriptor(
-	name = "Tick tracker",
+	name = "Tick Tracker",
 	description = "Display tick timing variance in an overlay",
 	tags = {"tick", "timers", "skill", "pvm", "lag"},
 	enabledByDefault = false
