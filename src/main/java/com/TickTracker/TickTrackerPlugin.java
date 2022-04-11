@@ -22,8 +22,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.inject.Inject;
 
-import static net.runelite.api.GameState.HOPPING;
-import static net.runelite.api.GameState.LOGGING_IN;
+import static net.runelite.api.GameState.*;
 
 
 @PluginDescriptor(
@@ -76,6 +75,7 @@ public class TickTrackerPlugin extends Plugin
 	private long runningTickAverageNS = 0;
 	private int disregardCounter = 0;
 	private double tickWithinRangePercent = 100;
+	private boolean isGameStateLoading = false;
 
 	@Provides
 	TickTrackerPluginConfiguration provideConfig(ConfigManager configManager)
@@ -104,7 +104,8 @@ public class TickTrackerPlugin extends Plugin
 		tickDiffNS = tickTimeNS - lastTickTimeNS;
 		lastTickTimeNS = tickTimeNS;
 
-		if (disregardCounter < config.disregardCounter())
+		//If the gameState is LOADING, then the server tick can be long for a valid reason
+		if (isGameStateLoading && disregardCounter < config.disregardCounter())
 		{
 			disregardCounter += 1; //ticks upon login or hopping are very inconsistent, thus the need for the disregard of the first ones
 			return;
@@ -146,6 +147,7 @@ public class TickTrackerPlugin extends Plugin
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged event)
 	{
+		isGameStateLoading = event.getGameState() == LOADING;
 		if (event.getGameState() == HOPPING || event.getGameState() == LOGGING_IN)
 		{
 			resetStats(false);
