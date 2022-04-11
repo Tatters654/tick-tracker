@@ -32,7 +32,6 @@ Sends a red chat text message if the previous tick was over a user-configurable 
 When you log in and the game is still loading in assets/rendering the world/receiving some initial startup data from the server, your perceived game ticks are very inconsistent. This option is to disregard X many ticks from login, to make the plugin more acurate. **I have left this option in the configuration for customizability reasons, but you probably should not lower it below 15 if you do not know what you are doing.**
 
 ### TO DO
-- Implement disregarding the tick if (GAMESTATE == LOADING), because this produces a faulty result
 - Finish logging branch and merge it into master  
   - While the logging branch works for now, overhaul the logging format
 - Implement weighting for different variance thresholds
