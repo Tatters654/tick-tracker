@@ -1,6 +1,7 @@
 
 package com.TickTracker;
 
+import com.TickTracker.config.LogFormatStyle;
 import com.TickTracker.config.SmallOverlayStyle;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -150,5 +151,19 @@ public interface TickTrackerPluginConfiguration extends Config
 		return 15;
 	}
 
+	@ConfigItem(
+		keyName = "LogEnabled",
+		name = "Log to file",
+		description = "Log to %userprofile%/.runelite/ticklogs",
+		position = 13
+	)
+	default boolean logEnabled() { return false; }
 
+	@ConfigItem(
+		keyName =  "logFormatStyle",
+		name = "Logging format",
+		description = "What to log. Session for logging each session in a compact format. Each tick option for logging each tick, if you for some reason want to do that.",
+		position = 14
+	)
+	default LogFormatStyle logFormatStyle() { return LogFormatStyle.SESSION; }
 }

@@ -1,6 +1,7 @@
 
 package com.TickTracker;
 
+import com.TickTracker.config.LogFormatStyle;
 import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,16 @@ import static net.runelite.api.GameState.HOPPING;
 import static net.runelite.api.GameState.LOGGING_IN;
 
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.rolling.RollingFileAppender;
+import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
+import org.slf4j.LoggerFactory;
+
+
 @PluginDescriptor(
 	name = "Tick tracker",
 	description = "Display tick timing variance in an overlay",
@@ -41,6 +52,9 @@ public class TickTrackerPlugin extends Plugin
 		final String message = new ChatMessageBuilder().append(ChatColorType.HIGHLIGHT).append(chatMessage).build();
 		chatMessageManager.queue(QueuedMessage.builder().type(ChatMessageType.CONSOLE).runeLiteFormattedMessage(message).build());
 	}
+
+	private static final String BASE_DIRECTORY = System.getProperty("user.home") + "/.runelite/ticklogs/";
+	private Logger tickLogger;
 
 	@Inject
 	private Client client;
@@ -76,6 +90,9 @@ public class TickTrackerPlugin extends Plugin
 	private long runningTickAverageNS = 0;
 	private int disregardCounter = 0;
 	private double tickWithinRangePercent = 100;
+	private int worldNumber;
+	private long tickVarianceFromIdealMS;
+
 
 	@Provides
 	TickTrackerPluginConfiguration provideConfig(ConfigManager configManager)
@@ -95,6 +112,7 @@ public class TickTrackerPlugin extends Plugin
 	{
 		overlayManager.add(overlay);
 		overlayManager.add(SmallOverlay);
+		tickLogger = setupLogger("ticklogger", "/");
 	}
 
 	@Subscribe
@@ -110,9 +128,10 @@ public class TickTrackerPlugin extends Plugin
 			return;
 		}
 
-		long tickVarianceFromIdealMS = Math.abs(IDEAL_TICK_LENGTH_NS - tickDiffNS) / NANOS_PER_MILLIS;
+		long tickVarianceFromIdealMS = (IDEAL_TICK_LENGTH_NS - tickDiffNS) / NANOS_PER_MILLIS;
+		long tickVarianceFromIdealAbsoluteMS = Math.abs(tickVarianceFromIdealMS);
 
-		if (tickVarianceFromIdealMS > config.warnLargeTickDiffValue())
+		if (tickVarianceFromIdealAbsoluteMS > config.warnLargeTickDiffValue())
 		{
 			if (config.warnLargeTickDiff() &&  allTickCounter > config.disregardCounter())
 			{
@@ -120,15 +139,15 @@ public class TickTrackerPlugin extends Plugin
 			}
 		}
 
-		if (tickVarianceFromIdealMS > config.getThresholdHigh())
+		if (tickVarianceFromIdealAbsoluteMS > config.getThresholdHigh())
 		{
 			tickOverThresholdHigh += 1;
 		}
-		else if (tickVarianceFromIdealMS > config.getThresholdMedium())
+		else if (tickVarianceFromIdealAbsoluteMS > config.getThresholdMedium())
 		{
 			tickOverThresholdMedium += 1;
 		}
-		else if (tickVarianceFromIdealMS > config.getThresholdLow())
+		else if (tickVarianceFromIdealAbsoluteMS > config.getThresholdLow())
 		{
 			tickOverThresholdLow += 1;
 		}
@@ -141,6 +160,12 @@ public class TickTrackerPlugin extends Plugin
 		tickTimePassedNS += tickDiffNS;
 		runningTickAverageNS = tickTimePassedNS / allTickCounter;
 		tickWithinRangePercent = (tickWithinRange * 100.0) / allTickCounter;
+
+		if (config.logEnabled() && config.logFormatStyle() == LogFormatStyle.EACH_TICK)
+		{
+			LogInfo();
+		}
+
 	}
 
 	@Subscribe
@@ -148,6 +173,15 @@ public class TickTrackerPlugin extends Plugin
 	{
 		if (event.getGameState() == HOPPING || event.getGameState() == LOGGING_IN)
 		{
+			if (config.logEnabled()) {
+				worldNumber = client.getWorld();
+				Object date = new java.util.Date(); //spaghetti?
+				tickLogger.info("World: " + String.valueOf(worldNumber) + ", Time " + String.valueOf(date));
+			}
+			if (config.logFormatStyle() == LogFormatStyle.SESSION) {
+				LogInfo();
+			}
+			//possibly add alltickcounter > 15 check to these conditions
 			resetStats(false);
 		}
 	}
@@ -179,5 +213,57 @@ public class TickTrackerPlugin extends Plugin
 		tickDiffNS = 0;
 		runningTickAverageNS = 0;
 		disregardCounter = 0;
+	}
+	private Logger setupLogger(String loggerName, String subFolder) {
+		//borrowed from
+		//https://github.com/hex-agon/chat-logger/blob/cc4845de0587009f7d93a2ce3e6a4a1d8a296aae/src/main/java/fking/work/chatlogger/ChatLoggerPlugin.java#L154
+		LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+		PatternLayoutEncoder encoder = new PatternLayoutEncoder();
+		encoder.setContext(context);
+		encoder.setPattern("%msg %n"); //%date{ISO8601}
+		encoder.start();
+
+		String directory = BASE_DIRECTORY + subFolder + "/";
+
+		RollingFileAppender<ILoggingEvent> appender = new RollingFileAppender<>();
+		appender.setFile(directory + "latest.log");
+		appender.setAppend(true);
+		appender.setEncoder(encoder);
+		appender.setContext(context);
+
+		TimeBasedRollingPolicy<ILoggingEvent> logFilePolicy = new TimeBasedRollingPolicy<>();
+		logFilePolicy.setContext(context);
+		logFilePolicy.setParent(appender);
+		logFilePolicy.setFileNamePattern(directory + "ticklog_%d{yyyy-MM-dd}.log");
+		logFilePolicy.setMaxHistory(30); //TODO make configurable?
+		logFilePolicy.start();
+
+		appender.setRollingPolicy(logFilePolicy);
+		appender.start();
+
+		Logger logger = context.getLogger(loggerName);
+		logger.detachAndStopAllAppenders();
+		logger.setAdditive(false);
+		logger.setLevel(Level.INFO);
+		logger.addAppender(appender);
+
+		return logger;
+	}
+	private void LogInfo() {
+		if (config.logFormatStyle() == LogFormatStyle.SESSION) {
+			tickLogger.info(
+				"TicksOverThresholdHigh: " + String.valueOf(tickOverThresholdHigh) + ","
+				+ "TicksOverThresholdMedium: " + String.valueOf(tickOverThresholdMedium) + ","
+				+ "TicksOverThresholdLow: " + String.valueOf(tickOverThresholdLow) + ","
+				+ "TicksWithinRange: " + String.valueOf(tickWithinRange) + ","
+				+ "TotalTicks: " + String.valueOf(allTickCounter) + ",");
+		}
+		if (config.logFormatStyle() == LogFormatStyle.EACH_TICK) {
+			tickLogger.info(String.valueOf(tickVarianceFromIdealMS)); //cant access local variable
+		}
+		else {
+			sendChatMessage("debug loginfo, goes to else branch");
+		}
 	}
 }
