@@ -66,7 +66,7 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 		final int textHeight = graphics.getFontMetrics().getAscent() - graphics.getFontMetrics().getDescent();
 
 		// Draw waiting indicator if inside disregard period, then exit method
-		if (plugin.getDisregardCounter() < config.disregardCounter())
+		if (plugin.getDisregardCounter() < config.disregardTickCounter())
 		{
 			drawSmallOverlaySubsection(graphics, WAITING, clientWidth, xOffset, textHeight, true);
 			return;

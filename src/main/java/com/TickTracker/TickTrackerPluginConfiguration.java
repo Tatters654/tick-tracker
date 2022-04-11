@@ -140,12 +140,12 @@ public interface TickTrackerPluginConfiguration extends Config
 	default int warnLargeTickDiffValue() { return 150; }
 
 	@ConfigItem(
-		keyName = "disregardCounter",
+		keyName = "disregardTickCounter",
 		name = "Disregard ticks on login",
 		description = "Ticks on login are very inconsistent. Having this too low can lead to inaccurate measurements.",
 		position = 12
 	)
-	default int disregardCounter()
+	default int disregardTickCounter()
 	{
 		return 15;
 	}

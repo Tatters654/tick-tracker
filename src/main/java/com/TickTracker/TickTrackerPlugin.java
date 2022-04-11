@@ -105,7 +105,7 @@ public class TickTrackerPlugin extends Plugin
 		lastTickTimeNS = tickTimeNS;
 
 		//If the gameState is LOADING, then the server tick can be long for a valid reason
-		if (isGameStateLoading || disregardCounter < config.disregardCounter())
+		if (isGameStateLoading || disregardCounter < config.disregardTickCounter())
 		{
 			disregardCounter += 1; //ticks upon login or hopping are very inconsistent, thus the need for the disregard of the first ones
 			return;
@@ -115,7 +115,7 @@ public class TickTrackerPlugin extends Plugin
 
 		if (tickVarianceFromIdealMS > config.warnLargeTickDiffValue())
 		{
-			if (config.warnLargeTickDiff() &&  allTickCounter > config.disregardCounter())
+			if (config.warnLargeTickDiff() &&  allTickCounter > config.disregardTickCounter())
 			{
 				sendChatMessage("Tick was " + tickDiffNS / NANOS_PER_MILLIS + "ms long");
 			}

@@ -1,3 +1,4 @@
+
 #Tick tracker
 
 Tick Tracker tracks how well your selected game server is performing. It displays the data through a small, colored overlay at the top right corner of your screen.
