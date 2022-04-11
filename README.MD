@@ -36,6 +36,7 @@ When you log in and the game is still loading in assets/rendering the world/rece
 - Finish logging branch and merge it into master  
   - While the logging branch works for now, overhaul the logging format
 - Implement weighting for different variance thresholds
+- Optimize the calculations in the plugin. I'm quite sure this could be optimized, but I'm not sure if its necessary.
 - Possibly add more options for placement of the small display
 - Possibly add more options for the font and size of the small display
 
