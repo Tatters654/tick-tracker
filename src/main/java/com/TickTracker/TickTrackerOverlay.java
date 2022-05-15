@@ -42,7 +42,7 @@ public class TickTrackerOverlay extends OverlayPanel
 	private LineComponent tickOverThresholdLineComponent(int tickOverThreshold, String configThreshold)
 	{
 		return LineComponent.builder()
-			.right(String.format("%d (%.2f %%)", tickOverThreshold, (tickOverThreshold * 100.0) / plugin.getAllTickCounter()))
+			.right(String.format("%d (%.2f %%)", tickOverThreshold, (tickOverThreshold * 100.0) / plugin.getTicksPassed()))
 			.left("+/- >" + configThreshold)
 			.build();
 	}
@@ -50,14 +50,14 @@ public class TickTrackerOverlay extends OverlayPanel
 	private void drawExtraInformation(Graphics2D graphics)
 	{
 		panelComponent.getChildren().addAll(asList(TitleComponent.builder().text("Ticks").build(),
-			tickOverThresholdLineComponent(plugin.getTickOverThresholdHigh(), String.valueOf(config.getThresholdHigh())),
-			tickOverThresholdLineComponent(plugin.getTickOverThresholdMedium(), String.valueOf(config.getThresholdMedium())),
-			tickOverThresholdLineComponent(plugin.getTickOverThresholdLow(), String.valueOf(config.getThresholdLow())),
+			tickOverThresholdLineComponent(plugin.getTicksOverThresholdHigh(), String.valueOf(config.getThresholdHigh())),
+			tickOverThresholdLineComponent(plugin.getTicksOverThresholdMedium(), String.valueOf(config.getThresholdMedium())),
+			tickOverThresholdLineComponent(plugin.getTicksOverThresholdLow(), String.valueOf(config.getThresholdLow())),
 			LineComponent.builder()
-				.right(String.format("%d (%.2f %%)", plugin.getTickWithinRange(), plugin.getTickWithinRangePercent()))
+				.right(String.format("%d (%.2f %%)", plugin.getTicksWithinRange(), plugin.getTicksWithinRangePercent()))
 				.left("Good")
 				.build(),
-			LineComponent.builder().right(String.valueOf(plugin.getAllTickCounter())).left("Total").build(),
+			LineComponent.builder().right(String.valueOf(plugin.getTicksPassed())).left("Total").build(),
 			LineComponent.builder().right(String.valueOf(plugin.getTickDiffNS() / plugin.getNANOS_PER_MILLIS())).left("Last Tick ms").build(),
 			LineComponent.builder().right(String.valueOf(plugin.getRunningTickAverageNS() / plugin.getNANOS_PER_MILLIS())).left("Tick Average ms").build()));
 		panelComponent.setPreferredSize(new Dimension(graphics.getFontMetrics().stringWidth("average tick ms+extra fill600"), 0));

@@ -54,7 +54,7 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 
 	private void drawSmallOverlay(Graphics2D graphics)
 	{
-		// taken from the fps plugin
+		//original overlay code was copied from fps plugin, but has been modified since
 		Widget logoutButton = client.getWidget(WidgetInfo.RESIZABLE_MINIMAP_LOGOUT_BUTTON);
 		int xOffset = X_OFFSET;
 		if (logoutButton != null && !logoutButton.isHidden())
@@ -94,7 +94,7 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 		if (config.drawSmallOverlay() == SmallOverlayStyle.PERCENTAGE || config.drawSmallOverlay() == SmallOverlayStyle.BOTH)
 		{
 			xOffset += drawSmallOverlaySubsection(graphics,
-					String.format("%.2f%%", plugin.getTickWithinRangePercent()),
+					String.format("%.2f%%", plugin.getTimeDifferencePercentDouble()),
 					clientWidth, xOffset, textHeight,
 					config.smallOverlayColorStyle() == SmallOverlayStyle.LAST_DIFF);
 		}
@@ -115,11 +115,11 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 			return Color.YELLOW;
 		}
 
-		if (plugin.getTickWithinRangePercent() >= config.warningColorThresholdUpper())
+		if (plugin.getTimeDifferencePercentDouble() >= config.warningColorThresholdUpper())
 		{
 			return Color.GREEN;
 		}
-		else if (plugin.getTickWithinRangePercent() >= config.warningColorThresholdLower())
+		else if (plugin.getTimeDifferencePercentDouble() >= config.warningColorThresholdLower())
 		{
 			return Color.YELLOW;
 		}

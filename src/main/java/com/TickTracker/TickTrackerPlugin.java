@@ -19,12 +19,14 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
+import lombok.extern.slf4j.Slf4j;
+
 
 import javax.inject.Inject;
 
 import static net.runelite.api.GameState.*;
 
-
+@Slf4j
 @PluginDescriptor(
 	name = "Tick Tracker",
 	description = "Display tick timing variance in an overlay",
@@ -67,15 +69,20 @@ public class TickTrackerPlugin extends Plugin
 	private long lastTickTimeNS = 0L;
 	private long tickDiffNS = 0;
 	private long tickTimePassedNS = 0;
-	private int tickOverThresholdLow = 0;
-	private int tickOverThresholdMedium = 0;
-	private int tickOverThresholdHigh = 0;
-	private int tickWithinRange = 0;
-	private int allTickCounter = 0;
-	private long runningTickAverageNS = 0;
+	//large overlay statistics
+	private int ticksOverThresholdLow = 0;
+	private int ticksOverThresholdMedium = 0;
+	private int ticksOverThresholdHigh = 0;
+	private int ticksWithinRange = 0;
+	private int ticksPassed = 0;
 	private int disregardCounter = 0;
-	private double tickWithinRangePercent = 100;
+	private double ticksWithinRangePercent = 100;
+	private double timeDifferencePercentDouble = 100;
+	private long runningTickAverageNS = 0;
+	private long sumOfTimeVariationFromIdeal = 0;
+	private long idealTimePassed = 0;
 	private boolean isGameStateLoading = false;
+
 
 	@Provides
 	TickTrackerPluginConfiguration provideConfig(ConfigManager configManager)
@@ -112,36 +119,24 @@ public class TickTrackerPlugin extends Plugin
 		}
 
 		long tickVarianceFromIdealMS = Math.abs(IDEAL_TICK_LENGTH_NS - tickDiffNS) / NANOS_PER_MILLIS;
+		logTickLength(tickVarianceFromIdealMS);
 
-		if (tickVarianceFromIdealMS > config.warnLargeTickDiffValue())
+		if (tickVarianceFromIdealMS > config.warnLargeTickDiffValue() && config.warnLargeTickDiff())
 		{
-			if (config.warnLargeTickDiff() &&  allTickCounter > config.disregardTickCounter())
-			{
-				sendChatMessage("Tick was " + tickDiffNS / NANOS_PER_MILLIS + "ms long");
-			}
+			sendChatMessage("Tick was " + tickDiffNS / NANOS_PER_MILLIS + "ms long");
 		}
 
-		if (tickVarianceFromIdealMS > config.getThresholdHigh())
-		{
-			tickOverThresholdHigh += 1;
-		}
-		else if (tickVarianceFromIdealMS > config.getThresholdMedium())
-		{
-			tickOverThresholdMedium += 1;
-		}
-		else if (tickVarianceFromIdealMS > config.getThresholdLow())
-		{
-			tickOverThresholdLow += 1;
-		}
-		else
-		{
-			tickWithinRange += 1;
-		}
-
-		allTickCounter += 1;
+		sumOfTimeVariationFromIdeal += tickVarianceFromIdealMS;
+		ticksPassed += 1;
 		tickTimePassedNS += tickDiffNS;
-		runningTickAverageNS = tickTimePassedNS / allTickCounter;
-		tickWithinRangePercent = (tickWithinRange * 100.0) / allTickCounter;
+		runningTickAverageNS = tickTimePassedNS / ticksPassed;
+		idealTimePassed = ticksPassed * 600L; //cast 600 to long, probably fine but double check before publishing
+		timeDifferencePercentDouble = (((double)idealTimePassed - sumOfTimeVariationFromIdeal) / idealTimePassed) * 100; // *100 to make it a nice percent
+		ticksWithinRangePercent = (ticksWithinRange * 100.0) / ticksPassed;
+
+
+		log.debug("sumOfTimeVariationFromIdeal" + sumOfTimeVariationFromIdeal);
+		log.debug("timeDifferencePercentDouble" + timeDifferencePercentDouble);
 	}
 
 	@Subscribe
@@ -165,21 +160,42 @@ public class TickTrackerPlugin extends Plugin
 	}
 
 	private void resetStats(boolean onlyVarianceRelevantStats) {
-		tickOverThresholdHigh = 0;
-		tickOverThresholdMedium = 0;
-		tickOverThresholdLow = 0;
-		tickWithinRange = 0;
-		allTickCounter = 0;
+		//large display info
+		ticksOverThresholdHigh = 0;
+		ticksOverThresholdMedium = 0;
+		ticksOverThresholdLow = 0;
+		ticksWithinRange = 0;
+		//plugin internals
+		ticksPassed = 0;
 		tickTimePassedNS = 0;
-		tickWithinRangePercent = 100;
-
+		timeDifferencePercentDouble = 100;
+		ticksWithinRangePercent = 100;
+		sumOfTimeVariationFromIdeal = 0;
+		idealTimePassed = 0;
 		if (onlyVarianceRelevantStats) {
 			return;
 		}
-
 		lastTickTimeNS = 0;
 		tickDiffNS = 0;
 		runningTickAverageNS = 0;
 		disregardCounter = 0;
+	}
+	private void logTickLength(long tick) {
+		if (tick > config.getThresholdHigh())
+		{
+			ticksOverThresholdHigh += 1;
+		}
+		else if (tick > config.getThresholdMedium())
+		{
+			ticksOverThresholdMedium += 1;
+		}
+		else if (tick > config.getThresholdLow())
+		{
+			ticksOverThresholdLow += 1;
+		}
+		else
+		{
+			ticksWithinRange += 1;
+		}
 	}
 }
