@@ -78,7 +78,7 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 		if (config.drawSmallOverlay() == SmallOverlayStyle.LAST_DIFF || config.drawSmallOverlay() == SmallOverlayStyle.BOTH)
 		{
 			xOffset += drawSmallOverlaySubsection(graphics,
-					String.format("%dms", plugin.getTickDiffNS() / plugin.getNANOS_PER_MILLIS()),
+					String.format("%d ms", plugin.getTickDiffNS() / plugin.getNANOS_PER_MILLIS()),
 					clientWidth, xOffset, textHeight,
 					config.smallOverlayColorStyle() == SmallOverlayStyle.PERCENTAGE);
 		}

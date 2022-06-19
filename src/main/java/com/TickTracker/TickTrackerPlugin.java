@@ -130,6 +130,7 @@ public class TickTrackerPlugin extends Plugin
 		ticksPassed += 1;
 		tickTimePassedNS += tickDiffNS;
 		runningTickAverageNS = tickTimePassedNS / ticksPassed;
+		//TODO doublecheck these
 		idealTimePassed = ticksPassed * 600L; //cast 600 to long, probably fine but double check before publishing
 		timeDifferencePercentDouble = (((double)idealTimePassed - sumOfTimeVariationFromIdeal) / idealTimePassed) * 100; // *100 to make it a nice percent
 		ticksWithinRangePercent = (ticksWithinRange * 100.0) / ticksPassed;
@@ -166,6 +167,7 @@ public class TickTrackerPlugin extends Plugin
 		ticksOverThresholdLow = 0;
 		ticksWithinRange = 0;
 		//plugin internals
+		//TODO doublecheck these
 		ticksPassed = 0;
 		tickTimePassedNS = 0;
 		timeDifferencePercentDouble = 100;
