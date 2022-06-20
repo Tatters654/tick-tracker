@@ -1,6 +1,7 @@
 
 package com.TickTracker;
 
+import com.TickTracker.config.MillisecondDefaultSectionColor;
 import com.TickTracker.config.SmallOverlayStyle;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -149,6 +150,30 @@ public interface TickTrackerPluginConfiguration extends Config
 	{
 		return 15;
 	}
+
+	@ConfigItem(
+			keyName = "redMillisecondColor",
+			name = "redMillisecondColor",
+			description = "",
+			position = 13
+	)
+	default int redMillisecondColor() { return 200; }
+
+	@ConfigItem(
+			keyName = "orangeMillisecondColor",
+			name = "orangeMillisecondColor",
+			description = "",
+			position = 14
+	)
+	default int orangeMillisecondColor() { return 100; }
+
+	@ConfigItem(
+			keyName = "defaultMSsectioncolor",
+			name = "default ms section color",
+			description = "",
+			position = 15
+	)
+	default MillisecondDefaultSectionColor MillisecondDefaultSectionColor() { return MillisecondDefaultSectionColor.YELLOW; }
 
 
 }

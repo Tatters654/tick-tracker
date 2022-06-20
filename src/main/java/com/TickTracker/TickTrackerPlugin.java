@@ -82,6 +82,7 @@ public class TickTrackerPlugin extends Plugin
 	private long sumOfTimeVariationFromIdeal = 0;
 	private long idealTimePassed = 0;
 	private boolean isGameStateLoading = false;
+	private int tickDiffMS = 0;
 
 
 	@Provides
@@ -110,6 +111,7 @@ public class TickTrackerPlugin extends Plugin
 		long tickTimeNS = System.nanoTime();
 		tickDiffNS = tickTimeNS - lastTickTimeNS;
 		lastTickTimeNS = tickTimeNS;
+		tickDiffMS = (int) (tickDiffNS / NANOS_PER_MILLIS);
 
 		//If the gameState is LOADING, then the server tick can be long for a valid reason
 		if (isGameStateLoading || disregardCounter < config.disregardTickCounter())
@@ -123,7 +125,7 @@ public class TickTrackerPlugin extends Plugin
 
 		if (tickVarianceFromIdealMS > config.warnLargeTickDiffValue() && config.warnLargeTickDiff())
 		{
-			sendChatMessage("Tick was " + tickDiffNS / NANOS_PER_MILLIS + "ms long");
+			sendChatMessage("Tick was " + tickDiffMS + "ms long");
 		}
 
 		sumOfTimeVariationFromIdeal += tickVarianceFromIdealMS;

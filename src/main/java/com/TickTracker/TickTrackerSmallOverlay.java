@@ -104,11 +104,11 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 	{
 		final int textWidth = graphics.getFontMetrics().stringWidth(toDraw);
 		final Point point = new Point(clientWidth - textWidth - xOffset, textHeight + config.Y_Offset());
-		OverlayUtil.renderTextLocation(graphics, point, toDraw, colorSelection(offForSection));
+		OverlayUtil.renderTextLocation(graphics, point, toDraw, colorSelectionPercentage(offForSection));
 		return textWidth;
 	}
 
-	public Color colorSelection(boolean offForSection)
+	public Color colorSelectionPercentage(boolean offForSection)
 	{
 		if (offForSection || config.smallOverlayColorStyle() == SmallOverlayStyle.NONE)
 		{
@@ -126,6 +126,17 @@ public class TickTrackerSmallOverlay extends OverlayPanel
 		else
 		{
 			return Color.RED;
+		}
+	}
+	public Color colorSelectionMillisecond(boolean offForSection){
+		if (Math.abs( plugin.getTickDiffMS() - config.redMillisecondColor()) >= 200 ){
+			return Color.RED;
+		}
+		if (Math.abs(plugin.getTickDiffMS() - config.orangeMillisecondColor()) >= 100){
+			return Color.ORANGE;
+		}
+		else {
+			return Color.YELLOW;
 		}
 	}
 }
