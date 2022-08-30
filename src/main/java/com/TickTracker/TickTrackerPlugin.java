@@ -82,8 +82,7 @@ public class TickTrackerPlugin extends Plugin
 	private long idealTimePassed = 0;
 	private boolean isGameStateLoading = false;
 	private int tickDiffMS = 0;
-	private double runningTickAverageNS = 0;
-	private double runningDSquaredNS = 0;
+	private RunningStats runningTickAverageNS = new RunningStats();
 
 
 	@Provides
@@ -136,15 +135,7 @@ public class TickTrackerPlugin extends Plugin
 		idealTimePassed = ticksPassed * 600L; //cast 600 to long, probably fine but double check before publishing
 		timeDifferencePercentDouble = (((double)idealTimePassed - sumOfTimeVariationFromIdeal) / idealTimePassed) * 100; // *100 to make it a nice percent
 		ticksWithinRangePercent = (ticksWithinRange * 100.0) / ticksPassed;
-
-		//Running average/variance/standard deviation from here:
-		//https://nestedsoftware.com/2018/03/27/calculating-standard-deviation-on-streaming-data-253l.23919.html
-		double meanDifferential  = (tickDiffNS - runningTickAverageNS) / ticksPassed;
-		double newMean = runningTickAverageNS + meanDifferential;
-		double dSquaredIncrement = (tickDiffNS - newMean) * (tickDiffNS - runningTickAverageNS);
-		double newDSquared = runningDSquaredNS + dSquaredIncrement;
-		runningTickAverageNS = newMean;
-		runningDSquaredNS = newDSquared;
+		runningTickAverageNS.update(tickDiffNS);
 
 		log.debug("sumOfTimeVariationFromIdeal" + sumOfTimeVariationFromIdeal);
 		log.debug("timeDifferencePercentDouble" + timeDifferencePercentDouble);
@@ -170,14 +161,6 @@ public class TickTrackerPlugin extends Plugin
 		}
 	}
 
-	public double getTickVarianceNS() {
-		return ticksPassed > 1 ? runningDSquaredNS / (ticksPassed - 1) : 0;
-	}
-
-	public double getTickStandardDeviationNS() {
-		return Math.sqrt(getTickVarianceNS());
-	}
-
 	private void resetStats(boolean onlyVarianceRelevantStats) {
 		//large display info
 		ticksOverThresholdHigh = 0;
@@ -197,8 +180,7 @@ public class TickTrackerPlugin extends Plugin
 		}
 		lastTickTimeNS = 0;
 		tickDiffNS = 0;
-		runningTickAverageNS = 0;
-		runningDSquaredNS = 0;
+		runningTickAverageNS.reset();
 		disregardCounter = 0;
 	}
 	private void logTickLength(long tick) {
