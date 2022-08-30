@@ -59,7 +59,8 @@ public class TickTrackerOverlay extends OverlayPanel
 				.build(),
 			LineComponent.builder().right(String.valueOf(plugin.getTicksPassed())).left("Total").build(),
 			LineComponent.builder().right(String.valueOf(plugin.getTickDiffNS() / plugin.getNANOS_PER_MILLIS())).left("Last Tick ms").build(),
-			LineComponent.builder().right(String.valueOf(plugin.getRunningTickAverageNS() / plugin.getNANOS_PER_MILLIS())).left("Tick Average ms").build()));
+			LineComponent.builder().right(String.valueOf((long)(plugin.getRunningTickAverageNS() / plugin.getNANOS_PER_MILLIS()))).left("Tick Average ms").build(),
+			LineComponent.builder().right(String.format("%.2f", plugin.getTickStandardDeviationNS() / plugin.getNANOS_PER_MILLIS())).left("Tick STDEV ms").build()));
 		panelComponent.setPreferredSize(new Dimension(graphics.getFontMetrics().stringWidth("average tick ms+extra fill600"), 0));
 	}
 }
