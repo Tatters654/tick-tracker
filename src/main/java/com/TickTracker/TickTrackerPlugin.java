@@ -78,11 +78,11 @@ public class TickTrackerPlugin extends Plugin
 	private int disregardCounter = 0;
 	private double ticksWithinRangePercent = 100;
 	private double timeDifferencePercentDouble = 100;
-	private long runningTickAverageNS = 0;
 	private long sumOfTimeVariationFromIdeal = 0;
 	private long idealTimePassed = 0;
 	private boolean isGameStateLoading = false;
 	private int tickDiffMS = 0;
+	private RunningStats runningTickAverageNS = new RunningStats();
 
 
 	@Provides
@@ -131,12 +131,11 @@ public class TickTrackerPlugin extends Plugin
 		sumOfTimeVariationFromIdeal += tickVarianceFromIdealMS;
 		ticksPassed += 1;
 		tickTimePassedNS += tickDiffNS;
-		runningTickAverageNS = tickTimePassedNS / ticksPassed;
 		//TODO doublecheck these
 		idealTimePassed = ticksPassed * 600L; //cast 600 to long, probably fine but double check before publishing
 		timeDifferencePercentDouble = (((double)idealTimePassed - sumOfTimeVariationFromIdeal) / idealTimePassed) * 100; // *100 to make it a nice percent
 		ticksWithinRangePercent = (ticksWithinRange * 100.0) / ticksPassed;
-
+		runningTickAverageNS.update(tickDiffNS);
 
 		log.debug("sumOfTimeVariationFromIdeal" + sumOfTimeVariationFromIdeal);
 		log.debug("timeDifferencePercentDouble" + timeDifferencePercentDouble);
@@ -181,7 +180,7 @@ public class TickTrackerPlugin extends Plugin
 		}
 		lastTickTimeNS = 0;
 		tickDiffNS = 0;
-		runningTickAverageNS = 0;
+		runningTickAverageNS.reset();
 		disregardCounter = 0;
 	}
 	private void logTickLength(long tick) {

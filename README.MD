@@ -10,6 +10,27 @@ The percentage value in the top right is a simple division of (Ticks within pass
 
 ![MinimapImage](TickTrackerMinimapImage.PNG)
 
+# Extra Information
+To get a more detailed display of tick statistics you can enable the "Show extra information" option in the plugin settings.
+
+#### +/- >X
+Displays percentage/how many ticks were greater than the Variance high/medium/low setting
+
+#### Last Tick ms
+Displays the time in milliseconds between the most recent tick and the previous tick
+
+#### Tick Average ms
+Displays a running average of the time between ticks. This should be 600ms on an ideal server
+
+#### Tick STDEV ms
+Displays the standard deviation of the time between ticks. This tells you how spread out the time between ticks is. A perfect server would have a standard deviation of 0ms
+
+The standard deviation can be used for more advanced statistics, but it is most useful as a quick number to glance at to get an idea of how good a server is.
+
+When comparing two servers, the one with a higher standard deviation will be worse. IE. Lower = better
+
+![ExtraInformation](ExtraInformation.PNG)
+
 ### Configuration
 #### Height selector
 
